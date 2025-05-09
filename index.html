@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carp and Carp Cup 2025</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <header>
+    <h1>🎣 Carp and Carp Cup 2025</h1>
+  </header>
+
+  <main>
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>Helyezés</th>
+          <th>Csapatnév</th>
+          <th><i class="fas fa-fish"></i> 1. Hal</th>
+          <th><i class="fas fa-fish"></i> 2. Hal</th>
+          <th><i class="fas fa-fish"></i> 3. Hal</th>
+          <th><i class="fas fa-fish"></i> 4. Hal</th>
+          <th><i class="fas fa-fish"></i> 5. Hal</th>
+          <th>Összesen (kg)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rank">-</td>
+          <td>Fülöp Carp Team</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td class="total-weight">0</td>
+        </tr>
+        <tr>
+          <td class="rank">-</td>
+          <td>Carp Hunter Team</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td class="total-weight">0</td>
+        </tr>
+        <tr>
+          <td class="rank">-</td>
+          <td>ViNo Carp Team</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td class="total-weight">0</td>
+        </tr>
+        <tr>
+          <td class="rank">-</td>
+          <td>PaSa Team</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td class="total-weight">0</td>
+        </tr>
+        <tr>
+          <td class="rank">-</td>
+          <td>T&T Carp Team</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td class="total-weight">0</td>
+        </tr>
+        <tr>
+          <td class="rank">-</td>
+          <td>KutyaPonyt Team</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td class="total-weight">0</td>
+        </tr>
+        <tr>
+          <td class="rank">-</td>
+          <td>Team Géza</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td class="total-weight">0</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div id="biggestFish">
+      <h2>🏆 Legnagyobb hal:</h2>
+      <p><i class="fas fa-fish"></i> <span id="biggestFishWeight">-</span> kg - <strong id="biggestFishTeam">-</strong></p>
+    </div>
+
+    <div id="leaderTeam">
+      <h2>🥇 Vezető csapat össztömeg alapján:</h2>
+      <p><i class="fas fa-trophy"></i> <strong id="leaderTeamName">-</strong> - <span id="leaderTeamWeight">-</span> kg</p>
+    </div>
+  </main>
+
+<script>
+  const table = document.getElementById('resultsTable');
+  const tbody = table.querySelector('tbody');
+  const biggestFishWeightEl = document.getElementById('biggestFishWeight');
+  const biggestFishTeamEl = document.getElementById('biggestFishTeam');
+  const leaderTeamNameEl = document.getElementById('leaderTeamName');
+  const leaderTeamWeightEl = document.getElementById('leaderTeamWeight');
+  const adminPassword = "ponty2025";
+
+  function updateResults() {
+    let biggest = 0;
+    let teamName = '-';
+    const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.querySelectorAll('td').length === 8);
+
+    rows.forEach(row => {
+      let sum = 0;
+      let tds = row.querySelectorAll('td');
+      let team = tds[1].innerText;
+
+      for (let i = 2; i <= 6; i++) {
+        let val = parseFloat(tds[i].innerText.replace(",", "."));
+        if (!isNaN(val)) {
+          sum += val;
+          if (val > biggest) {
+            biggest = val;
+            teamName = team;
+          }
+        }
+      }
+
+      tds[7].innerText = sum.toFixed(2);
+    });
+
+    rows.sort((a, b) => {
+      const weightA = parseFloat(a.cells[7].innerText) || 0;
+      const weightB = parseFloat(b.cells[7].innerText) || 0;
+      return weightB - weightA;
+    });
+
+    rows.forEach((row, index) => {
+      row.cells[0].innerText = index + 1;
+      tbody.appendChild(row);
+    });
+
+    biggestFishWeightEl.innerText = biggest > 0 ? biggest.toFixed(2) : '-';
+    biggestFishTeamEl.innerText = teamName;
+    leaderTeamNameEl.innerText = rows[0].cells[1].innerText;
+    leaderTeamWeightEl.innerText = rows[0].cells[7].innerText;
+  }
+
+  function enableEdit() {
+    const input = document.getElementById('adminPass').value;
+    if (input === adminPassword) {
+      const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.querySelectorAll('td').length === 8);
+      rows.forEach(row => {
+        for (let i = 2; i <= 6; i++) {
+          row.cells[i].setAttribute("contenteditable", "true");
+          row.cells[i].style.backgroundColor = "#2e572e";
+        }
+      });
+      alert("Admin mód engedélyezve!");
+    } else {
+      alert("Hibás jelszó!");
+    }
+  }
+
+  updateResults();
+</script>
+
+</body>
+</html>
